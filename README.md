@@ -6,5 +6,5 @@
 - Combinational and sequential logics
 - Computer arithmetic algorithms
 
-** Always write "synthesizable" codes **
+**Always write "synthesizable" codes**
 
