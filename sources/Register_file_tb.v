@@ -9,15 +9,15 @@ module Register_file_tb;
     reg WR, CLK, RSTn;
     
 
-    Register_file MODULENAME
-	 ( .PORTNAME(CLK),
-	.PORTNAME(RSTn),
-	.PORTNAME(ADDR_A),
-	.PORTNAME(ADDR_B),
-	.PORTNAME(DATA_IN),
-	.PORTNAME(WR),
-	.PORTNAME(SRC), 
-	.PORTNAME(DEST)
+    Register_file dut
+	 ( .CLK(CLK),
+	.RSTn(RSTn),
+	.Addr_A(ADDR_A),
+	.Addr_B(ADDR_B),
+	.Data_in(DATA_IN),
+	.WR(WR),
+	.Src(SRC), 
+	.Dest(DEST)
 	); 
      
        
