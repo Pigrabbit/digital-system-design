@@ -9,7 +9,7 @@ module Register_file_tb;
     reg WR, CLK, RSTn;
     
 
-    Register_file dut
+    register_file dut
 	 ( .CLK(CLK),
 	.RSTn(RSTn),
 	.Addr_A(ADDR_A),
