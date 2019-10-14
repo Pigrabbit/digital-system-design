@@ -123,19 +123,19 @@ always@(posedge CLK) begin
             case (alu_sel) 
             6'b100000 : begin
        		///// flag update
-                flag_reg[4] = flag_in[4];
-                flag_reg[2] = flag_in[2];
+                flag_reg[4] <= flag_in[4];
+                flag_reg[2] <= flag_in[2];
             end
             6'b010000 : begin
             ///// flag update
-                flag_reg[4] = flag_in[4];
-                flag_reg[2] = flag_in[2];
+                flag_reg[4] <= flag_in[4];
+                flag_reg[2] <= flag_in[2];
             end
             6'b001000 : begin
             ///// flag update
-                flag_reg[3] = flag_in[3];
-                flag_reg[1] = flag_in[1];
-                flag_reg[0] = flag_in[0];
+                flag_reg[3] <= flag_in[3];
+                flag_reg[1] <= flag_in[1];
+                flag_reg[0] <= flag_in[0];
             end
             default : ;
             endcase
