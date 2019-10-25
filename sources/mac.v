@@ -34,12 +34,12 @@ reg mul_done;
 reg add_done;
 
 reg mult_sign_res = 1'b0;
-reg [2*A_BITWIDTH-3:0] mult_mag_res = (2*A_BITWIDTH-3){1'b0};
-reg [2*A_BITWIDTH-2:0] mult_result;
+reg [2*A_BITWIDTH-3:0] mult_mag_res; // 14 bit
+reg [2*A_BITWIDTH-2:0] mult_result; // 15 bit
 
 reg add_sign_res = 1'b0;
-reg [C_BITWIDTH-1:0] c_reg;
-reg [C_EXTEN_BITWIDTH-1:0] add_mag_res = C_EXTEN_BITWIDTH{1'b0};
+reg [C_BITWIDTH-1:0] c_reg; // 8bit
+reg [C_EXTEN_BITWIDTH:0] add_mag_res; // 15bit
 
 // data_c_exten is Extended DATA_C
 // Because C is added with A*B, both of C and A*B have same fraction bits (12bit = 2^-12) and better to have same # of bits
@@ -110,9 +110,9 @@ always @ (posedge CLK or negedge RSTn) begin
             // Done flag reset!
                 DONE <= 1'b0;
                 mult_sign_res <= 1'b0;
-                mult_mag_res <= 0;
-                mult_result <= 0;
-                add_mag_res <= 0;
+                mult_mag_res <= 14'b0;
+                mult_result <= 15'b0;
+                add_mag_res <= 15'b0;
                 add_sign_res <= 1'b0;
                 c_reg <= DATA_C;
             end
@@ -121,18 +121,34 @@ always @ (posedge CLK or negedge RSTn) begin
             // TO DO
             // Do multiply
                 mult_sign_res <= DATA_A[A_BITWIDTH-1] ^ DATA_B[B_BITWIDTH-1];
-                mult_mag_res <= DATA_A[A_BITWIDTH-2:0] * DATA_B[B_BITWIDTH-2:0]
+                mult_mag_res <= DATA_A[A_BITWIDTH-2:0] * DATA_B[B_BITWIDTH-2:0];
                 mult_result <= {mult_sign_res, mult_mag_res};
+
                 mul_done <= 1'b1;
             end
             
             STATE_Addx: begin
             // TO DO
             // Do add
-                if (mult_result[2*A_BITWIDTH-2] == 1) mult_result[2*A_BITWIDTH-3:0] <= -1'b1 * mult_result[2*A_BITWIDTH-3:0];
-                if (DATA_C[C_BITWIDTH-1] == 1) c_reg[C_BITWIDTH-2:0] <= -1'b1 * DATA_C[C_BITWIDTH-2:0];
+                if(mult_result[14] == 1) begin
+                    if (c_reg[7] == 1) begin
+                        add_mag_res = mult_result[13:0] + c_reg[6:0];
+                    end
+                    else if (c_reg[7] == 0) begin
+                        add_mag_res = mult_result[13:0] + c_reg[6:0];
+                    end
+                end
+                else if(mult_result[14] == 0) begin
+                    if (c_reg[7] == 1) begin
+                        add_mag_res = mult_result[13:0] - c_reg[6:0];
+                    end
+                    else if (c_reg[7] == 0) begin
+                        add_mag_res = mult_result[13:0] + c_reg[6:0];
+                    end
+                end
                 
-                MOUT <= mult_result[2*A_BITWIDTH-3:0] + c_reg[C_BITWIDTH-2:0];
+                add_sign_res = mult_result[14] ^ c_reg[7];
+                MOUT <= {add_sign_res, add_mag_res}
                 add_done <= 1'b1;
             end 
 
