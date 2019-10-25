@@ -134,22 +134,23 @@ always @(posedge clk or negedge rstn) begin
       // #####################
       // TO DO
       // #####################
-      if(b_read_done) begin
-      // read 하고 나서
+      if(delay == 2'b00) begin
+          // read 하는 operation
+        bram_en <= 1'b1;
+        we <= 1'b0;
+        addr <= 4'b0000;
+        delay <= delay + 2'b01;    
+      end
+      else if (delay == 2'b01) delay <= delay + 2'b01;
+      else if (delay == 2'b10) begin
+        // 결과를 받은 후 flag를 1로 바꿈
+        b_read_done <= 1'b1;
         data_a <= dout[7:0];
         data_b <= dout[15:8];
         data_c <= dout[23:16];
         bram_en <= 1'b0;
         addr <= 4'b1111;
-        b_read_done <= 1'b0;
-      end
-      else begin
-      // read 하는 operation
-        bram_en <= 1'b1;
-        we <= 1'b0;
-        addr <= 4'b0000;
-        // 결과를 받은 후 flag를 1로 바꿈
-        @(posedge clk) b_read_done <= 1'b1;
+        delay <= 2'b00;
       end
     end
     else begin
