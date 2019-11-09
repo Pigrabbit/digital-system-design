@@ -57,12 +57,33 @@ module receiver
 //-----------------------------    
     always @(posedge clk or negedge rstn) begin
         if (!rstn) begin 
-            
+            data <= 8'b0000_0000;
+            bit_counter <= 0;
+            done <= 1'b0;
+            valid <= 1'b0;
         end
-
         else begin
+            if(flag) begin
+                if(bit_counter < 8) begin
+                    data <= {RxD, data[7:1]};
+                    bit_counter <= bit_counter + 1;
+                end
+                else if (rdy && bit_counter == 8) begin
+                    done <= 1'b1;
+                    valid <= 1'b1;
+                    bit_counter <= bit_counter + 1;
+                end
+            end
+            else begin
+                if (bit_counter == 9 && RxD == 0) begin
+                    bit_counter <= 0;
+                end
+                else if(valid) begin
+                    valid <= 1'b0;
+                    done <= 1'b0;
+                end
+            end
             
-			
         end
     end
     
@@ -71,17 +92,20 @@ module receiver
 //-----------------------------  
     always @(posedge clk or negedge rstn) begin
         if (!rstn) begin
-            
+            state <= IDLE;
         end
         else begin        
             case(state)
                 IDLE: begin 
-                    
+                    if (receive) next_state <= RX;
+                    else next_state <= IDLE;
 				end
                 RX: begin
-                       
-                    end                
+                    if (bit_counter >= 8) next_state <= IDLE;
+                    else next_state <= RX;   
+                end                
             endcase
+            state <= next_state;
         end
     end
 endmodule
