@@ -146,9 +146,9 @@ always @ (posedge CLK or negedge RSTn) begin
                         add_mag_res = mult_result[13:0] + c_reg[6:0];
                     end
                 end
-                
+
                 add_sign_res = mult_result[14] ^ c_reg[7];
-                MOUT <= {add_sign_res, add_mag_res}
+                MOUT <= {add_sign_res, add_mag_res};
                 add_done <= 1'b1;
             end 
 
